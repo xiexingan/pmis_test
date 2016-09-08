@@ -14,23 +14,26 @@ module PMValidation
     
     def start
       @browser = Watir::Browser.new(:chrome)
-      get_performance
     end
     
     def goto(url)
       @browser.goto(url)
-      get_performance
     end
         
     def click(options={})
-      @browser.button(options).click if @browser.button(options)
-      @browser.link(options).click if @browser.link(options)
-      get_performance
+      @browser.element(options).when_present.click
     end
 
     def set_text(text, options={})
-      @browser.text_field(options).set(text)
-      get_performance
+      @browser.text_field(options).when_present.set(text)
+    end
+    
+    def hover(options={})
+      @browser.element(options).when_present.hover
+    end
+    
+    def wait_verify_element_present(verify_element_options={})
+      @browser.element(verify_element_options).wait_until_present
     end
     
     def stop
@@ -39,11 +42,6 @@ module PMValidation
       Time.now - start
     end
     
-    def get_performance
-      @browser.performance.summary[:response_time]/1000.0
-    end
-    
-    private_methods :get_performance
     alias_method :submit, :click
   end
 end

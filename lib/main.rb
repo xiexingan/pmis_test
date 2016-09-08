@@ -2,10 +2,9 @@
 # To change this template file, choose Tools | Templates
 # and open the template in the editor.
 
-require 'watir-webdriver'
+$:.unshift File.join(File.dirname(__FILE__),'pm_validation')
 
+require 'validation'
 
-b = Watir::Browser.new(:chrome)
-b.goto("http://www.chuantu.biz")
-b.file_field(:name=>"uploadimg").set("/home/ubuntu/Pictures/login_04.jpg")
-b.button(:type=>"submit", :class=>"button").click
+valid = PMValidation::Validation.new
+valid.validate

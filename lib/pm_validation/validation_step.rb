@@ -3,32 +3,35 @@
 # and open the template in the editor.
 module PMValidation
   class ValidationStep
-    attr_reader :id, :name, :step_actor
-    attr_accessor :state
+    attr_reader :id, :name, :step_actor, :options
+    attr_accessor :state, :verify_element_options
 
-    def initialize(step_actor, name)
+    def initialize(step_actor, name, options={})
       @id = StepID.instance.fetch_id
       @name = name
       @step_actor = step_actor
       @step_result = nil
       @state = :ready
+      @options = options
+      @verify_element_options = nil
     end
 
     def run
-      @response = 0
+      start = Time.now
       @success = false
-      begin
-        @response = self.run_step
-        @success = true
-      rescue
-        @success = false
-      end
+      self.run_step
+      @step_actor.wait_verify_element_present(@verify_element_options) if verify_is_required?
       @state = :already_run
-      @step_result = StepResult.new(@name, @success, @response)
+      @step_result = StepResult.new(@name, true, Time.now - start)
     end
 
     def get_result
       @step_result
+    end
+    
+    private
+    def verify_is_required?
+      @verify_element_options
     end
     
     protected
@@ -73,11 +76,10 @@ module PMValidation
   end
   
   class SetTextStep < ValidationStep
-    attr_reader :text, :options
-    def initialize(step_actor, name, text, options={})
+    attr_reader :text
+    def initialize(step_actor, name, text, options)
       @text = text
-      @options = options
-      super(step_actor, name)
+      super(step_actor, name, options)
     end
     
     protected
@@ -87,15 +89,35 @@ module PMValidation
   end
   
   class ClickStep < ValidationStep
-    attr_reader :options
-    def initialize(step_actor, name, options={})
-      @options = options
-      super(step_actor, name)
+    def initialize(step_actor, name, options)
+      super(step_actor, name, options)
     end
     
     protected
     def run_step
       @step_actor.click(@options)
+    end
+  end
+  
+  class HoverStep < ValidationStep
+    def initialize(step_actor, name, options)
+      super(step_actor, name, options)
+    end
+    
+    protected
+    def run_step
+      @step_actor.hover(@options)
+    end
+  end
+  
+  class VerifyElementStep < ValidationStep
+    def initialize(step_actor, name)
+      super(step_actor, name)
+    end
+    
+    protected
+    def run_step
+      #do nothing
     end
   end
 end
