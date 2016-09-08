@@ -9,33 +9,41 @@ module PMValidation
   class StepActor
     
     def initialize
+      
+    end
+    
+    def start
       @browser = Watir::Browser.new(:chrome)
+      get_performance
     end
     
     def goto(url)
       @browser.goto(url)
-      @browser.performance.summary[:response_time]/1000.0
+      get_performance
     end
         
-    def open_by_click(options={})
-      @browser.button(options).click if @browser.button(options)
-      @browser.link(options).click if @browser.link(options)
-      @browser.performance.summary[:response_time]/1000.0
-    end
-    
     def click(options={})
       @browser.button(options).click if @browser.button(options)
       @browser.link(options).click if @browser.link(options)
+      get_performance
     end
 
     def set_text(text, options={})
       @browser.text_field(options).set(text)
+      get_performance
     end
     
-    def destroy
+    def stop
+      start = Time.now
       @browser.close
+      Time.now - start
     end
     
-    alias_method :submit, :open_by_click
+    def get_performance
+      @browser.performance.summary[:response_time]/1000.0
+    end
+    
+    private_methods :get_performance
+    alias_method :submit, :click
   end
 end

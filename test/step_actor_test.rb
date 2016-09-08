@@ -10,18 +10,19 @@ require 'pm_validation/step_actor'
 class StepActorTest < Test::Unit::TestCase
   def setup
     @b = PMValidation::StepActor.new
+    response = @b.start
+    assert(response > 0)
   end
   
   def teardown
-    @b.destroy
+    response = @b.stop
+    assert(response > 0)
   end
   
   def test_goto
-    1.upto(10) do
-      response = @b.goto("http://www.baidu.com")
-      puts "Loading time #{response}"
-      assert(response > 0)
-    end
+    response = @b.goto("http://www.baidu.com")
+    puts "Loading time #{response}"
+    assert(response > 0)
   end
   
   def test_submit
@@ -31,4 +32,5 @@ class StepActorTest < Test::Unit::TestCase
     puts "Loading time #{response}"
     assert(response > 0)
   end
+ 
 end
