@@ -8,3 +8,5 @@ require 'validation'
 
 valid = PMValidation::Validation.new
 valid.validate
+valid.get_results
+
