@@ -4,7 +4,7 @@
 module PMValidation
   class ValidationStep
     attr_reader :id, :name, :step_actor, :options
-    attr_accessor :state, :verify_element_options
+    attr_accessor :state, :verify_element_options, :verify_expected
 
     def initialize(step_actor, name, options={})
       @id = StepID.instance.fetch_id
@@ -14,13 +14,15 @@ module PMValidation
       @state = :ready
       @options = options
       @verify_element_options = nil
+      @verify_expected = true
+      
     end
 
     def run
       start = Time.now
       @success = false
       self.run_step
-      @step_actor.wait_verify_element_present(@verify_element_options) if verify_is_required?
+      verify
       @state = :already_run
       @step_result = StepResult.new(@name, true, Time.now - start)
     end
@@ -29,14 +31,19 @@ module PMValidation
       @step_result
     end
     
-    private
-    def verify_is_required?
-      @verify_element_options
-    end
-    
     protected
     def run_step
       raise NotImplementError, "run_step methods should be override!"
+    end
+    
+    protected
+    def verify
+      @step_actor.wait_verify_element_present(@verify_element_options, @verify_expected) if verify_is_required?
+    end
+    
+    private
+    def verify_is_required?
+      @verify_element_options && self.class != VerifyElementStep
     end
   end
   
@@ -111,8 +118,10 @@ module PMValidation
   end
   
   class VerifyElementStep < ValidationStep
-    def initialize(step_actor, name)
-      super(step_actor, name)
+    attr_reader :expected
+    def initialize(step_actor, name, expected, options)
+      @expected = expected
+      super(step_actor, name, options)
     end
     
     protected
@@ -120,4 +129,5 @@ module PMValidation
       #do nothing
     end
   end
+  
 end

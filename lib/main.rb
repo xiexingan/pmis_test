@@ -8,5 +8,7 @@ require 'validation'
 
 valid = PMValidation::Validation.new
 valid.validate
-valid.get_results
+valid.get_results.each do |r|
+  puts "#{r.step_name}: #{format("%.2f", r.response)}s"
+end
 

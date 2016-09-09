@@ -20,20 +20,25 @@ module PMValidation
       @browser.goto(url)
     end
         
-    def click(options={})
+    def click(options)
       @browser.element(options).when_present.click
     end
 
-    def set_text(text, options={})
+    def set_text(text, options)
       @browser.text_field(options).when_present.set(text)
     end
     
-    def hover(options={})
+    def hover(options)
       @browser.element(options).when_present.hover
     end
     
-    def wait_verify_element_present(verify_element_options={})
-      @browser.element(verify_element_options).wait_until_present
+    def wait_verify_element_present(verify_element_options, expected)
+      if expected
+        @browser.element(verify_element_options).wait_until_present
+      else
+        @browser.element(verify_element_options).wait_while_present
+      end
+
     end
     
     def stop

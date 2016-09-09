@@ -20,16 +20,20 @@ module PMValidation
       OpenPageStep.new(@step_actor, name, url)
     end
     
-    def create_click(name, options={})
+    def create_click(name, options)
       ClickStep.new(@step_actor, name, options)
     end
     
-    def create_hover(name, options={})
+    def create_hover(name, options)
       HoverStep.new(@step_actor, name, options)
     end
     
-    def create_set_text(name, text, options={})
+    def create_set_text(name, text, options)
       SetTextStep.new(@step_actor, name, text, options)
+    end
+    
+    def create_verify(name, expected, options)
+      VerifyElementStep.new(@step_actor, name, expected, options)
     end
   end
 end
