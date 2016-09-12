@@ -5,10 +5,14 @@
 $:.unshift File.join(File.dirname(__FILE__),'pm_validation')
 
 require 'validation'
+require 'hardware_info'
 
-valid = PMValidation::Validation.new
-valid.validate
-valid.get_results.each do |r|
-  puts "#{r.step_name}: #{format("%.2f", r.response)}s"
-end
+hw = PMValidation::HardwareInfo.new
+hw.collection_hardware_info
+
+#valid = PMValidation::Validation.new
+#valid.validate
+#valid.get_results.each do |r|
+#  #puts "#{r.step_name}: #{format("%.2f", r.response)}s"
+#end
 
